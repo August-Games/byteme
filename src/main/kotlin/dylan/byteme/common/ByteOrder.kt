@@ -12,7 +12,7 @@ enum class ByteOrder {
     None,
 
     /**
-     * Reversed order: Every bit in reversed order.
+     * Reversed order: Every byte in reversed order.
      * For a 4-byte integer (ABCD), the order is: DCBA.
      * For a big mish-mash of bytes (ABCDEFGH), the order is: HGFEDCBA.
      *
