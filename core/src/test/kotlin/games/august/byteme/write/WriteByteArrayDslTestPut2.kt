@@ -1,14 +1,14 @@
-package dylan.byteme.write
+package games.august.byteme.write
 
 import com.google.common.truth.Truth.assertThat
-import dylan.byteme.common.Endian
-import dylan.byteme.common.Transformation
-import dylan.byteme.write.WriteByteArrayDsl.writeByteArray
+import games.august.byteme.common.Endian
+import games.august.byteme.common.Transformation
+import games.august.byteme.write.WriteByteArrayDsl.writeByteArray
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.TestFactory
 
-class `WriteByteArrayDslTest+put2` {
+class WriteByteArrayDslTestPut2 {
 
     @TestFactory
     fun `Test put2 Endian ordering Transformation#None`(): List<DynamicTest> {

@@ -1,4 +1,4 @@
-package dylan.byteme.common
+package games.august.byteme.common
 
 enum class Transformation {
     /**

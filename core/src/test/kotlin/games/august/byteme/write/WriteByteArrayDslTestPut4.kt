@@ -1,16 +1,16 @@
-package dylan.byteme.write
+package games.august.byteme.write
 
 import com.google.common.truth.Truth.assertThat
-import dylan.byteme.common.Endian
-import dylan.byteme.common.Transformation
-import dylan.byteme.write.WriteByteArrayDsl.writeByteArray
+import games.august.byteme.common.Endian
+import games.august.byteme.common.Transformation
+import games.august.byteme.write.WriteByteArrayDsl.writeByteArray
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.TestFactory
 
-class `WriteByteArrayDslTest+put3` {
+class WriteByteArrayDslTestPut4 {
     @TestFactory
-    fun `Test put3 Endian ordering Transformation#None`(): List<DynamicTest> {
+    fun `Test put4 Endian ordering Transformation#None`(): List<DynamicTest> {
         class TestCase(
             val name: String,
             val inputs: List<Int>,
@@ -29,7 +29,10 @@ class `WriteByteArrayDslTest+put3` {
             TestCase(
                 name = "Three-byte int",
                 inputs = listOf(packed3Byte),
+                // NOTE: lettering below is offset by 1 because packed3Byte has 0b00000000 byte inserted at front for put4.
+                // i.e. a.toByte() is actually 'B'
                 expectedBigEndianOutput = byteArrayOf(
+                    0b0,
                     a.toByte(),
                     b.toByte(),
                     c.toByte(),
@@ -38,23 +41,27 @@ class `WriteByteArrayDslTest+put3` {
                     c.toByte(),
                     b.toByte(),
                     a.toByte(),
+                    0b0,
                 ),
                 expectedMiddleEndianOutput = byteArrayOf(
-                    a.toByte(),
-                    c.toByte(),
-                    b.toByte(),
+                    b.toByte(), // C
+                    c.toByte(), // D
+                    0b0, // A
+                    a.toByte(), // B
                 ),
                 expectedInverseMiddleEndianOutput = byteArrayOf(
-                    c.toByte(),
-                    a.toByte(),
-                    b.toByte(),
+                    a.toByte(), // B
+                    0b0, // A
+                    c.toByte(), // D
+                    b.toByte(), // C
                 ),
             ),
             TestCase(
                 name = "Four-byte int",
                 inputs = listOf(packed4Byte),
-                // NOTE: The first byte is ignored, because put3 only takes from the least significant 3 bytes.
+                // NOTE: The first byte is ignored, because put4 only takes from the least significant 3 bytes.
                 expectedBigEndianOutput = byteArrayOf(
+                    a.toByte(),
                     b.toByte(),
                     c.toByte(),
                     d.toByte(),
@@ -63,15 +70,18 @@ class `WriteByteArrayDslTest+put3` {
                     d.toByte(),
                     c.toByte(),
                     b.toByte(),
+                    a.toByte(),
                 ),
                 expectedMiddleEndianOutput = byteArrayOf(
-                    b.toByte(),
-                    d.toByte(),
                     c.toByte(),
+                    d.toByte(),
+                    a.toByte(),
+                    b.toByte(),
                 ),
                 expectedInverseMiddleEndianOutput = byteArrayOf(
-                    d.toByte(),
                     b.toByte(),
+                    a.toByte(),
+                    d.toByte(),
                     c.toByte(),
                 ),
             ),
@@ -80,28 +90,28 @@ class `WriteByteArrayDslTest+put3` {
                 dynamicTest("(BE): ${it.name}") {
                     assertThat(
                         writeByteArray {
-                            it.inputs.forEach { input -> put3(input, endian = Endian.Big) }
+                            it.inputs.forEach { input -> put4(input, endian = Endian.Big) }
                         }
                     ).isEqualTo(it.expectedBigEndianOutput)
                 },
                 dynamicTest("(LE): ${it.name}") {
                     assertThat(
                         writeByteArray {
-                            it.inputs.forEach { input -> put3(input, endian = Endian.Little) }
+                            it.inputs.forEach { input -> put4(input, endian = Endian.Little) }
                         }
                     ).isEqualTo(it.expectedLittleEndianOutput)
                 },
                 dynamicTest("(ME): ${it.name}") {
                     assertThat(
                         writeByteArray {
-                            it.inputs.forEach { input -> put3(input, endian = Endian.Middle) }
+                            it.inputs.forEach { input -> put4(input, endian = Endian.Middle) }
                         }
                     ).isEqualTo(it.expectedMiddleEndianOutput)
                 },
                 dynamicTest("(IME): ${it.name}") {
                     assertThat(
                         writeByteArray {
-                            it.inputs.forEach { input -> put3(input, endian = Endian.InverseMiddle) }
+                            it.inputs.forEach { input -> put4(input, endian = Endian.InverseMiddle) }
                         }
                     ).isEqualTo(it.expectedInverseMiddleEndianOutput)
                 },
@@ -110,7 +120,7 @@ class `WriteByteArrayDslTest+put3` {
     }
 
     @TestFactory
-    fun `Test put3 Transformation#Add`(): List<DynamicTest> {
+    fun `Test put4 Transformation#Add`(): List<DynamicTest> {
         class TestCase(
             val name: String,
             val input: Int,
@@ -128,7 +138,8 @@ class `WriteByteArrayDslTest+put3` {
                 name = "$packed3Byte",
                 input = packed3Byte,
                 expectedOutput = byteArrayOf(
-                    0b00110011.toByte(), // 3387136 + 128 == 3387264 == 0b00110011_10101111_10000000
+                    0b0,
+                    0b00110011.toByte(), // 3387136 + 128 == 3387264 == 0b00000000_00110011_10101111_10000000
                     0b10101111.toByte(),
                     0b10000000.toByte(),
                 ),
@@ -137,9 +148,9 @@ class `WriteByteArrayDslTest+put3` {
                 name = "$packed4Byte",
                 input = packed4Byte,
                 expectedOutput = byteArrayOf(
-//                    0b00011011.toByte(),
-                    0b10101111.toByte(), // 464453887 + 128 == 464454015 == 0b00011011_10101111_00000001_01111111
-                    0b00000001.toByte(), // Most significant byte is ignored because using put3
+                    0b00011011.toByte(), // 464453887 + 128 == 464454015 == 0b00011011_10101111_00000001_01111111
+                    0b10101111.toByte(),
+                    0b00000001.toByte(),
                     0b01111111.toByte(),
                 ),
             ),
@@ -147,7 +158,7 @@ class `WriteByteArrayDslTest+put3` {
             dynamicTest("(BE): ${it.name}") {
                 assertThat(
                     writeByteArray {
-                        put3(it.input, transformation = Transformation.Add, endian = Endian.Big)
+                        put4(it.input, transformation = Transformation.Add, endian = Endian.Big)
                     }
                 ).isEqualTo(it.expectedOutput)
             }
@@ -155,7 +166,7 @@ class `WriteByteArrayDslTest+put3` {
     }
 
     @TestFactory
-    fun `Test put3 Transformation#Negate`(): List<DynamicTest> {
+    fun `Test put4 Transformation#Negate`(): List<DynamicTest> {
         class TestCase(
             val name: String,
             val input: Int,
@@ -173,8 +184,8 @@ class `WriteByteArrayDslTest+put3` {
                 name = "$packed3Byte",
                 input = packed3Byte,
                 expectedOutput = byteArrayOf(
-//                    0b11111111.toByte(), // ignore most significant byte because using put3
-                    0b11001100.toByte(), // negate 3387136 == -3387136 == 0b11111111_11001100_01010001_00000000
+                    0b11111111.toByte(), // negate 3387136 == -3387136 == 0b11111111_11001100_01010001_00000000
+                    0b11001100.toByte(),
                     0b01010001.toByte(),
                     0b00000000.toByte(),
                 ),
@@ -183,8 +194,8 @@ class `WriteByteArrayDslTest+put3` {
                 name = "$packed4Byte",
                 input = packed4Byte,
                 expectedOutput = byteArrayOf(
-//                    0b11100100.toByte(), // ignore most significant byte because using put3
-                    0b01010000.toByte(), // negate 464453887 == -464453887 == 0b11100100_01010000_11111111_00000001
+                    0b11100100.toByte(), // negate 464453887 == -464453887 == 0b11100100_01010000_11111111_00000001
+                    0b01010000.toByte(),
                     0b11111111.toByte(),
                     0b00000001.toByte(),
                 ),
@@ -193,7 +204,7 @@ class `WriteByteArrayDslTest+put3` {
             dynamicTest("(BE): ${it.name}") {
                 assertThat(
                     writeByteArray {
-                        put3(it.input, transformation = Transformation.Negate, endian = Endian.Big)
+                        put4(it.input, transformation = Transformation.Negate, endian = Endian.Big)
                     }
                 ).isEqualTo(it.expectedOutput)
             }
@@ -201,7 +212,7 @@ class `WriteByteArrayDslTest+put3` {
     }
 
     @TestFactory
-    fun `Test put3 Transformation#Subtract`(): List<DynamicTest> {
+    fun `Test put4 Transformation#Subtract`(): List<DynamicTest> {
         class TestCase(
             val name: String,
             val input: Int,
@@ -219,8 +230,8 @@ class `WriteByteArrayDslTest+put3` {
                 name = "$packed3Byte",
                 input = packed3Byte,
                 expectedOutput = byteArrayOf(
-//                    0b11111111.toByte(), // ignore most significant byte because using put3
-                    0b11001100.toByte(), // 128 - 3387136 == -3387008 == 0b11111111_11001100_01010001_10000000
+                    0b11111111.toByte(), // 128 - 3387136 == -3387008 == 0b11111111_11001100_01010001_10000000
+                    0b11001100.toByte(),
                     0b01010001.toByte(),
                     0b10000000.toByte(),
                 ),
@@ -229,8 +240,8 @@ class `WriteByteArrayDslTest+put3` {
                 name = "$packed4Byte",
                 input = packed4Byte,
                 expectedOutput = byteArrayOf(
-//                    0b11100100.toByte(), // ignore most significant byte because using put3
-                    0b01010000.toByte(), // 128 - 464453887 == -464453759 == 0b11100100_01010000_11111111_10000001
+                    0b11100100.toByte(), // 128 - 464453887 == -464453759 == 0b11100100_01010000_11111111_10000001
+                    0b01010000.toByte(),
                     0b11111111.toByte(),
                     0b10000001.toByte(),
                 ),
@@ -239,7 +250,7 @@ class `WriteByteArrayDslTest+put3` {
             dynamicTest("(BE): ${it.name}") {
                 assertThat(
                     writeByteArray {
-                        put3(it.input, transformation = Transformation.Subtract, endian = Endian.Big)
+                        put4(it.input, transformation = Transformation.Subtract, endian = Endian.Big)
                     }
                 ).isEqualTo(it.expectedOutput)
             }

@@ -10,3 +10,4 @@ plugins {
 }
 
 rootProject.name = "byteme"
+include("core")

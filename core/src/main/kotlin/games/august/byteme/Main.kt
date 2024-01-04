@@ -1,9 +1,9 @@
-package dylan.byteme
+package games.august.byteme
 
-import dylan.byteme.common.ByteOrder
-import dylan.byteme.common.Endian
-import dylan.byteme.common.Transformation
-import dylan.byteme.write.WriteByteArrayDsl.writeByteArray
+import games.august.byteme.common.ByteOrder
+import games.august.byteme.common.Endian
+import games.august.byteme.common.Transformation
+import games.august.byteme.write.WriteByteArrayDsl.writeByteArray
 
 fun main() {
     val bytes1: ByteArray = writeByteArray {

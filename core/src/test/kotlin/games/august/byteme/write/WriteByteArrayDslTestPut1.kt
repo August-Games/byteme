@@ -1,15 +1,10 @@
-package dylan.byteme.write
+package games.august.byteme.write
 
+import games.august.byteme.write.WriteByteArrayDsl.writeByteArray
 import com.google.common.truth.Truth.assertThat
-import dylan.byteme.common.Endian
-import dylan.byteme.common.Transformation
-import dylan.byteme.write.WriteByteArrayDsl.writeByteArray
-import org.junit.jupiter.api.DynamicTest
-import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestFactory
 
-class `WriteByteArrayDslTest+put1` {
+class WriteByteArrayDslTestPut1 {
     @Test
     fun `Test put1 (Transformation#None)`() {
         assertThat(

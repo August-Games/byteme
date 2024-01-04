@@ -1,4 +1,4 @@
-package dylan.byteme.common
+package games.august.byteme.common
 
 /**
  * Represents the ordering of bytes in a sequence.

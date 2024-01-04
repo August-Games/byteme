@@ -1,10 +1,10 @@
-package dylan.byteme.write
+package games.august.byteme.write
 
-import dylan.byteme.common.ByteOrder
-import dylan.byteme.common.Endian
-import dylan.byteme.common.Endian.*
-import dylan.byteme.common.Transformation
-import dylan.byteme.common.Transformation.*
+import games.august.byteme.common.ByteOrder
+import games.august.byteme.common.Endian
+import games.august.byteme.common.Endian.*
+import games.august.byteme.common.Transformation
+import games.august.byteme.common.Transformation.*
 
 object WriteByteArrayDsl {
 
@@ -102,12 +102,6 @@ object WriteByteArrayDsl {
                         bytes.add(byteList[2]) // C
                     }
                 }
-            }
-        }
-
-        private fun putBytesBigEndian(value: Int, numBytes: Int) {
-            for (shift in (numBytes - 1) downTo 0) {
-                bytes.add((value shr (Byte.SIZE_BITS * shift)).toByte())
             }
         }
 
