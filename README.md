@@ -79,7 +79,9 @@ Consider the following `ByteArray`:
 
 Specifying endianness when writing numbers will affect the order in which the bytes are written to the `ByteArray`. For example, the number `0x12345678` will be written as `12 34 56 78` in big endian, and `78 56 34 12` in little endian.
 
-This can be used in combination with [Transformation](#transformation)
+Refer to [Endian](src/main/kotlin/dylan/byteme/common/Endian.kt) KDoc for more information about the other options.
+
+This can be used in combination with [Transformation](#transformation).
 
 ### [Transformation](src/main/kotlin/dylan/byteme/common/Transformation.kt).
 
@@ -107,5 +109,7 @@ Consider a 4-byte number with the following bytes:
 // The following bytes will be written to the ByteArray (Big Endian)
 [00011011, 10101111, 00000001, 01111111]
 ```
+
+Refer to [Transformation](src/main/kotlin/dylan/byteme/common/Transformation.kt) KDoc for more information about the other options.
 
 This can be used in combination with [Endianness](#endianness).
