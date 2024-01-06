@@ -26,10 +26,10 @@ tasks.test {
     useJUnitPlatform()
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
+//java {
+//    withJavadocJar()
+//    withSourcesJar()
+//}
 
 kotlin {
     jvmToolchain(17)
@@ -67,44 +67,46 @@ extraProperties["signing.keyId"] = privateProperties["signingKeyId"]
 extraProperties["signing.password"] = privateProperties["signingKeyPassword"]
 extraProperties["signing.secretKeyRingFile"] = privateProperties["signingKeyLocation"]
 
-//publishing {
-//    publications {
-//        create<MavenPublication>("release") {
-//            from(components["java"])
-//
-//            groupId = groupName
-//            artifactId = artifactName
-//            version = versionName
-//
-//            pom {
-//                name.set(artifactName)
-//                description.set("A Kotlin DSL for writing bytes to a byte array")
-//                url.set("https://github.com/August-Games/byteme")
-//
-//                licenses {
-//                    license {
-//                        name.set("ByteMe License")
-//                        url.set("https://github.com/August-Games/byteme/blob/main/LICENSE")
-//                    }
-//                }
-//
-//                developers {
-//                    developer {
-//                        id.set("Dill-Lan")
-//                        name.set("Dylan")
-//                        email.set("11531208+Dill-Lan@users.noreply.github.com")
-//                    }
-//                }
-//
-//                scm {
-//                    connection.set("scm:git://github.com/August-Games/byteme.git")
-//                    developerConnection.set("scm:git:ssh://github.com:August-Games/byteme.git")
-//                    url.set("https://github.com/August-Games/byteme")
-//                }
-//            }
-//        }
-//    }
-//
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            from(components["java"])
+
+            groupId = groupName
+            artifactId = artifactName
+            version = versionName
+
+            pom {
+                name.set(artifactName)
+                description.set("A Kotlin DSL for writing bytes to a byte array")
+                url.set("https://github.com/August-Games/byteme")
+
+                licenses {
+                    license {
+                        name.set("ByteMe License")
+                        url.set("https://github.com/August-Games/byteme/blob/main/LICENSE")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("Dill-Lan")
+                        name.set("Dylan")
+                        email.set("11531208+Dill-Lan@users.noreply.github.com")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git://github.com/August-Games/byteme.git")
+                    developerConnection.set("scm:git:ssh://github.com:August-Games/byteme.git")
+                    url.set("https://github.com/August-Games/byteme")
+                }
+            }
+
+            artifact(tasks["kotlinSourcesJar"])
+        }
+    }
+
 //    repositories {
 //        maven {
 //            name = "sonatype"
@@ -122,9 +124,9 @@ extraProperties["signing.secretKeyRingFile"] = privateProperties["signingKeyLoca
 //        }
 //        mavenLocal()
 //    }
-//
-//    signing {
-//        sign(publishing.publications)
-//    }
-//}
+
+    signing {
+        sign(publishing.publications)
+    }
+}
 
