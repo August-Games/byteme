@@ -14,32 +14,41 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
         with:
-          java-version: '11'
-          distribution: 'adopt'
-
-      - name: Install gpg secret key
-        run: cat <(echo -e "${{ secrets.SIGNING_KEY_SECRET_ARMOR_EXPORT }}") | gpg --batch --import
-
-      - name: List gpg secret keys
-        run: gpg --list-secret-keys --keyid-format LONG
-
-      - name: Export gpg secret key
-        run: sudo gpg --export-secret-keys --pinentry-mode loopback --passphrase=${{ secrets.SIGNING_KEY_PASSWORD }} ${{ secrets.SIGNING_KEY_ID }} > /home/runner/work/byteme/secring.gpg
-
-      - name: Check dir
-        run: ls /home/runner/work/byteme
+          java-version: 17
+          distribution: 'corretto'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Publish to GitHub Packages
-        run: ./gradlew publish
+      - name: Build and upload archives to the Maven Central Repository
+        run: ./gradlew byteme:publishAllPublicationsToMavenCentralRepository
         env:
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-          SIGNING_KEY_LOCATION: /home/runner/work/byteme/secring.gpg
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY_SECRET_ARMOR_EXPORT }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+#      - name: Install gpg secret key
+#        run: cat <(echo -e "${{ secrets.SIGNING_KEY_SECRET_ARMOR_EXPORT }}") | gpg --batch --import
+#
+#      - name: List gpg secret keys
+#        run: gpg --list-secret-keys --keyid-format LONG
+#
+#      - name: Export gpg secret key
+#        run: sudo gpg --export-secret-keys --pinentry-mode loopback --passphrase=${{ secrets.SIGNING_KEY_PASSWORD }} ${{ secrets.SIGNING_KEY_ID }} > /home/runner/work/byteme/secring.gpg
+#
+#      - name: Check dir
+#        run: ls /home/runner/work/byteme
+#
+#      - name: Publish to GitHub Packages
+#        run: ./gradlew publish
+#        env:
+#          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+#          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+#          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+#          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+#          SIGNING_KEY_LOCATION: /home/runner/work/byteme/secring.gpg
