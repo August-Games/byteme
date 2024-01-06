@@ -24,7 +24,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and upload archives to the Maven Central Repository
-        run: ./gradlew publishAllPublicationsToMavenCentralRepository
+        run: ./gradlew core:publishAllPublicationsToMavenCentralRepository
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
