@@ -23,9 +23,6 @@ jobs:
       - name: Install gpg secret key
         run: cat <(echo -e "${{ secrets.SIGNING_KEY_SECRET_ARMOR_EXPORT }}") | gpg --batch --import
 
-      - name: Mkdirs
-        run: mkdir /home/runner/work/byteme
-
       - name: List gpg secret keys
         run: gpg --list-secret-keys --keyid-format LONG
 
