@@ -9,7 +9,7 @@ plugins {
 
 val groupName = "games.august"
 val artifactName = "byteme.core"
-val versionName = "1.0.0-SNAPSHOT"
+val versionName = "1.0.4-SNAPSHOT"
 group = groupName
 version = versionName
 
@@ -32,7 +32,7 @@ tasks.test {
 //}
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(11)
 }
 
 val privateProperties = Properties()
