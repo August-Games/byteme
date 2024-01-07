@@ -3,7 +3,6 @@ package games.august.byteme.write
 import com.google.common.truth.Truth.assertThat
 import games.august.byteme.common.Endian
 import games.august.byteme.common.Transformation
-import games.august.byteme.write.WriteByteArrayDsl.writeByteArray
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.TestFactory

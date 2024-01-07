@@ -3,7 +3,7 @@ package games.august.byteme
 import games.august.byteme.common.ByteOrder
 import games.august.byteme.common.Endian
 import games.august.byteme.common.Transformation
-import games.august.byteme.write.WriteByteArrayDsl.writeByteArray
+import games.august.byteme.write.writeByteArray
 
 fun main() {
     val bytes1: ByteArray = writeByteArray {
