@@ -6,13 +6,14 @@ import games.august.byteme.common.Endian.*
 import games.august.byteme.common.Transformation
 import games.august.byteme.common.Transformation.*
 
-object WriteByteArrayDsl {
+fun bytes(block: WriteByteArrayDsl.WriteByteArrayBuilder.() -> Unit) = writeByteArray(block)
+fun writeByteArray(block: WriteByteArrayDsl.WriteByteArrayBuilder.() -> Unit): ByteArray {
+    val builder = WriteByteArrayDsl.WriteByteArrayBuilder()
+    builder.block()
+    return builder.build()
+}
 
-    fun writeByteArray(block: WriteByteArrayBuilder.() -> Unit): ByteArray {
-        val builder = WriteByteArrayBuilder()
-        builder.block()
-        return builder.build()
-    }
+object WriteByteArrayDsl {
 
     @DslMarker
     annotation class WriteByteArrayDslMarker
@@ -29,8 +30,11 @@ object WriteByteArrayDsl {
             bytes.add(byte)
         }
 
-        fun put1(int: Int) {
-            bytes.add(int.toByte())
+        fun put1(
+            int: Int,
+            transformation: Transformation = None,
+        ) {
+            putNumber(int, 1, transformation, Little)
         }
 
         fun put2(
@@ -51,7 +55,7 @@ object WriteByteArrayDsl {
             endian: Endian = Little,
         ) = putNumber(int, 4, transformation, endian)
 
-        fun putBytes(bytes: ByteArray, byteOrder: ByteOrder) {
+        fun putBytes(bytes: ByteArray, byteOrder: ByteOrder = ByteOrder.None) {
             this.bytes.addAll(
                 when (byteOrder) {
                     ByteOrder.None -> bytes.toList()
@@ -89,6 +93,7 @@ object WriteByteArrayDsl {
                         bytes.add(byteList[1]) // B
                     }
                 }
+
                 InverseMiddle -> {
                     if (numBytes < 3 || numBytes > 4) error("InverseMiddle order requires between 3 and 4 bytes")
                     if (numBytes == 3) {
