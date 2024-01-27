@@ -10,7 +10,7 @@ plugins {
 
 val groupName = "games.august"
 val artifactName = "byteme-core"
-val versionName = "1.1.1"
+val versionName = "1.1.2"
 group = groupName
 version = versionName
 
