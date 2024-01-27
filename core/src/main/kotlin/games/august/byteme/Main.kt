@@ -26,9 +26,9 @@ fun main() {
     val bytes2: ByteArray = writeByteArray {
         // Consider Int.MAX_VALUE is [A, B, C, D]
         put1(Int.MAX_VALUE) // D
-        put2(Int.MAX_VALUE) // C, D
-        put3(Int.MAX_VALUE) // B, C, D
-        put4(Int.MAX_VALUE) // A, B, C, D
+        put2(Int.MAX_VALUE, endian = Endian.Little) // C, D
+        put3(Int.MAX_VALUE, endian = Endian.Little) // B, C, D
+        put4(Int.MAX_VALUE, endian = Endian.Little) // A, B, C, D
     }
     println(
         """

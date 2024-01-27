@@ -40,19 +40,19 @@ object WriteByteArrayDsl {
         fun put2(
             int: Int,
             transformation: Transformation = None,
-            endian: Endian = Little,
+            endian: Endian,
         ) = putNumber(int, 2, transformation, endian)
 
         fun put3(
             int: Int,
             transformation: Transformation = None,
-            endian: Endian = Little,
+            endian: Endian,
         ) = putNumber(int, 3, transformation, endian)
 
         fun put4(
             int: Int,
             transformation: Transformation = None,
-            endian: Endian = Little,
+            endian: Endian,
         ) = putNumber(int, 4, transformation, endian)
 
         fun putBytes(bytes: ByteArray, byteOrder: ByteOrder = ByteOrder.None) {
@@ -68,7 +68,7 @@ object WriteByteArrayDsl {
             value: Int,
             numBytes: Int,
             transformation: Transformation = None,
-            endian: Endian = Little
+            endian: Endian,
         ) {
             val byteList = mutableListOf<Byte>()
 
