@@ -1,13 +1,13 @@
 # byteme
 
 [![PUBLISH](https://github.com/August-Games/byteme/actions/workflows/publish.yml/badge.svg)](https://github.com/August-Games/byteme/actions/workflows/publish.yml)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/games.august/byteme.core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/games.august/byteme.core)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/games.august/byteme.core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/games.august/byteme-core)
 
-At this point, this just contains a DSL for creating a `ByteArray`, including options for specifying [Transformation](src/main/kotlin/dylan/byteme/common/Transformation.kt) or [Endian](src/main/kotlin/dylan/byteme/common/Endian.kt)ness when writing individual numbers, or [ByteOrder](src/main/kotlin/dylan/byteme/common/ByteOrder.kt) when writing the contents of an entire `ByteArray`.
+At this point, this just contains a DSL for creating a `ByteArray`, including options for specifying [Transformation](core/src/main/kotlin/games/august/byteme/common/Transformation.kt) or [Endian](core/src/main/kotlin/games/august/byteme/common/Endian.kt)ness when writing individual numbers, or [ByteOrder](core/src/main/kotlin/games/august/byteme/common/ByteOrder.kt) when writing the contents of an entire `ByteArray`.
 
 ## Example
 
-See [Writing `ByteArray`s](#writing-bytearrays) and [Writing numbers](#writing-numbers) for more information. For further examples, refer to [the unit tests](src/test/kotlin/dylan/byteme/write).
+See [Writing `ByteArray`s](#writing-bytearrays) and [Writing numbers](#writing-numbers) for more information. For further examples, refer to [the unit tests](core/src/test/kotlin/games/august/byteme/write).
 
 Note: the invocations of `put1`/`put2`/etc. are using the default values for `Transformation` and `Endian` which are `Transformation.None` and `Endian.Little`.
 
@@ -51,7 +51,7 @@ println(
 
 ## Writing `ByteArray`s
 
-### [ByteOrder](src/main/kotlin/dylan/byteme/common/ByteOrder.kt)
+### [ByteOrder](core/src/main/kotlin/games/august/byteme/common/ByteOrder.kt)
 
 Specifying a `ByteOrder` when writing a `ByteArray` will affect the order in which the bytes are written to the `ByteArray`.
 
@@ -78,15 +78,15 @@ Consider the following `ByteArray`:
 
 ## Writing numbers
 
-### [Endian](src/main/kotlin/dylan/byteme/common/Endian.kt)ness
+### [Endian](core/src/main/kotlin/games/august/byteme/common/Endian.kt)ness
 
 Specifying endianness when writing numbers will affect the order in which the bytes are written to the `ByteArray`. For example, the number `0x12345678` will be written as `12 34 56 78` in big endian, and `78 56 34 12` in little endian.
 
-Refer to [Endian](src/main/kotlin/dylan/byteme/common/Endian.kt) KDoc for more information about the other options.
+Refer to [Endian](core/src/main/kotlin/games/august/byteme/common/Endian.kt) KDoc for more information about the other options.
 
 This can be used in combination with [Transformation](#transformation).
 
-### [Transformation](src/main/kotlin/dylan/byteme/common/Transformation.kt).
+### [Transformation](core/src/main/kotlin/games/august/byteme/common/Transformation.kt).
 
 Specifying a transformation when writing numbers will affect the value of the number before it is written to the `ByteArray`.
 
@@ -98,21 +98,24 @@ Consider a 4-byte number with the following bytes:
 0b11111111
 ```
 
-`Transformation.Add` will add `128` to the entire number before writing the bytes to the `ByteArray`.
+`Transformation.Add` will add `128` to the last byte of the number before writing the bytes to the `ByteArray`.
 
 ```
 // The decimal value of the number is 464,453,887
 [00110011, 10101111, 00000000, 11111111] = 464,453,887
 
-// Add 128 to the number
-464,453,887 + 128
-    = 464,454,015
-    = 00011011_10101111_00000001_01111111
+// Add 128 to the final byte
+[
+    00110011,
+    10101111,
+    00000000,
+    01111111, // 0b11111111 + 128 == 383 == 0b00000001_01111111
+]
 
 // The following bytes will be written to the ByteArray (Big Endian)
-[00011011, 10101111, 00000001, 01111111]
+[00011011, 10101111, 00000000, 01111111]
 ```
 
-Refer to [Transformation](src/main/kotlin/dylan/byteme/common/Transformation.kt) KDoc for more information about the other options.
+Refer to [Transformation](core/src/main/kotlin/games/august/byteme/common/Transformation.kt) KDoc for more information about the other options.
 
 This can be used in combination with [Endianness](#endianness).
