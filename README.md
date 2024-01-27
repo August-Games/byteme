@@ -1,7 +1,7 @@
 # byteme
 
 [![PUBLISH](https://github.com/August-Games/byteme/actions/workflows/publish.yml/badge.svg)](https://github.com/August-Games/byteme/actions/workflows/publish.yml)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/games.august/byteme.core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/games.august/byteme-core)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/games.august/byteme-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/games.august/byteme-core)
 
 At this point, this just contains a DSL for creating a `ByteArray`, including options for specifying [Transformation](core/src/main/kotlin/games/august/byteme/common/Transformation.kt) or [Endian](core/src/main/kotlin/games/august/byteme/common/Endian.kt)ness when writing individual numbers, or [ByteOrder](core/src/main/kotlin/games/august/byteme/common/ByteOrder.kt) when writing the contents of an entire `ByteArray`.
 
