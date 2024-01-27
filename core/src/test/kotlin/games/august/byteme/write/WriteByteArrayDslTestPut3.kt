@@ -8,6 +8,12 @@ import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.TestFactory
 
 class WriteByteArrayDslTestPut3 {
+    private val a = 0b00110011.toByte()
+    private val b = 0b10101111.toByte()
+    private val c = 0b00000000.toByte()
+    private val d = 0b11111111.toByte()
+    private val packed3Byte = 3387136   // 00110011_10101111_00000000          (ABC)
+    private val packed4Byte = 867107071 // 00110011_10101111_00000000_11111111 (ABCD)
     @TestFactory
     fun `Test put3 Endian ordering Transformation#None`(): List<DynamicTest> {
         class TestCase(
@@ -18,61 +24,23 @@ class WriteByteArrayDslTestPut3 {
             val expectedMiddleEndianOutput: ByteArray,
             val expectedInverseMiddleEndianOutput: ByteArray,
         )
-        val a = 0b00110011
-        val b = 0b10101111
-        val c = 0b00000000
-        val d = 0b11111111
-        val packed3Byte = (a shl 16) or (b shl 8) or c
-        val packed4Byte = (a shl 24) or (b shl 16) or (c shl 8) or d
         return listOf(
             TestCase(
                 name = "Three-byte int",
                 inputs = listOf(packed3Byte),
-                expectedBigEndianOutput = byteArrayOf(
-                    a.toByte(),
-                    b.toByte(),
-                    c.toByte(),
-                ),
-                expectedLittleEndianOutput = byteArrayOf(
-                    c.toByte(),
-                    b.toByte(),
-                    a.toByte(),
-                ),
-                expectedMiddleEndianOutput = byteArrayOf(
-                    a.toByte(),
-                    c.toByte(),
-                    b.toByte(),
-                ),
-                expectedInverseMiddleEndianOutput = byteArrayOf(
-                    c.toByte(),
-                    a.toByte(),
-                    b.toByte(),
-                ),
+                expectedBigEndianOutput = byteArrayOf(a, b, c),
+                expectedLittleEndianOutput = byteArrayOf(c, b, a),
+                expectedMiddleEndianOutput = byteArrayOf(a, c, b),
+                expectedInverseMiddleEndianOutput = byteArrayOf(c, a, b),
             ),
             TestCase(
                 name = "Four-byte int",
                 inputs = listOf(packed4Byte),
                 // NOTE: The first byte is ignored, because put3 only takes from the least significant 3 bytes.
-                expectedBigEndianOutput = byteArrayOf(
-                    b.toByte(),
-                    c.toByte(),
-                    d.toByte(),
-                ),
-                expectedLittleEndianOutput = byteArrayOf(
-                    d.toByte(),
-                    c.toByte(),
-                    b.toByte(),
-                ),
-                expectedMiddleEndianOutput = byteArrayOf(
-                    b.toByte(),
-                    d.toByte(),
-                    c.toByte(),
-                ),
-                expectedInverseMiddleEndianOutput = byteArrayOf(
-                    d.toByte(),
-                    b.toByte(),
-                    c.toByte(),
-                ),
+                expectedBigEndianOutput = byteArrayOf(b, c, d),
+                expectedLittleEndianOutput = byteArrayOf(d, c, b),
+                expectedMiddleEndianOutput = byteArrayOf(b, d, c),
+                expectedInverseMiddleEndianOutput = byteArrayOf(d, b, c),
             ),
         ).flatMap {
             listOf(
@@ -116,30 +84,24 @@ class WriteByteArrayDslTestPut3 {
             val expectedOutput: ByteArray,
         )
 
-        // a = 0b00110011
-        // b = 0b10101111
-        // c = 0b00000000
-        // d = 0b11111111
-        val packed3Byte = 3387136   // 00110011_10101111_00000000          (ABC)
-        val packed4Byte = 464453887 // 00011011_10101111_00000000_11111111 (ABCD)
         return listOf(
             TestCase(
                 name = "$packed3Byte",
                 input = packed3Byte,
                 expectedOutput = byteArrayOf(
-                    0b00110011.toByte(), // 3387136 + 128 == 3387264 == 0b00110011_10101111_10000000
-                    0b10101111.toByte(),
-                    0b10000000.toByte(),
+                    a,
+                    b,
+                    0b10000000.toByte(), // 0b00000000 + 128 == 0b10000000
                 ),
             ),
             TestCase(
                 name = "$packed4Byte",
                 input = packed4Byte,
                 expectedOutput = byteArrayOf(
-//                    0b00011011.toByte(),
-                    0b10101111.toByte(), // 464453887 + 128 == 464454015 == 0b00011011_10101111_00000001_01111111
-                    0b00000001.toByte(), // Most significant byte is ignored because using put3
-                    0b01111111.toByte(),
+                    // a, // Most significant byte is ignored because using put3
+                    b,
+                    c,
+                    0b01111111.toByte(), // 0b11111111 + 128 == 383 == 0b00000001_01111111
                 ),
             ),
         ).map {
@@ -160,32 +122,24 @@ class WriteByteArrayDslTestPut3 {
             val input: Int,
             val expectedOutput: ByteArray,
         )
-
-        // a = 0b00110011
-        // b = 0b10101111
-        // c = 0b00000000
-        // d = 0b11111111
-        val packed3Byte = 3387136   // 00110011_10101111_00000000          (ABC)
-        val packed4Byte = 464453887 // 00011011_10101111_00000000_11111111 (ABCD)
         return listOf(
             TestCase(
                 name = "$packed3Byte",
                 input = packed3Byte,
                 expectedOutput = byteArrayOf(
-//                    0b11111111.toByte(), // ignore most significant byte because using put3
-                    0b11001100.toByte(), // negate 3387136 == -3387136 == 0b11111111_11001100_01010001_00000000
-                    0b01010001.toByte(),
-                    0b00000000.toByte(),
+                    a,
+                    b,
+                    0b00000000.toByte(), // negate 0b00000000 == 0b00000000
                 ),
             ),
             TestCase(
                 name = "$packed4Byte",
                 input = packed4Byte,
                 expectedOutput = byteArrayOf(
-//                    0b11100100.toByte(), // ignore most significant byte because using put3
-                    0b01010000.toByte(), // negate 464453887 == -464453887 == 0b11100100_01010000_11111111_00000001
-                    0b11111111.toByte(),
-                    0b00000001.toByte(),
+//                    a, // ignore most significant byte because using put3
+                    b,
+                    c,
+                    0b00000001.toByte(), // negate 0b11111111 == 0b00000001
                 ),
             ),
         ).map {
@@ -206,32 +160,24 @@ class WriteByteArrayDslTestPut3 {
             val input: Int,
             val expectedOutput: ByteArray,
         )
-
-        // a = 0b00110011
-        // b = 0b10101111
-        // c = 0b00000000
-        // d = 0b11111111
-        val packed3Byte = 3387136   // 00110011_10101111_00000000          (ABC)
-        val packed4Byte = 464453887 // 00011011_10101111_00000000_11111111 (ABCD)
         return listOf(
             TestCase(
                 name = "$packed3Byte",
                 input = packed3Byte,
                 expectedOutput = byteArrayOf(
-//                    0b11111111.toByte(), // ignore most significant byte because using put3
-                    0b11001100.toByte(), // 128 - 3387136 == -3387008 == 0b11111111_11001100_01010001_10000000
-                    0b01010001.toByte(),
-                    0b10000000.toByte(),
+                    a,
+                    b,
+                    0b10000000.toByte(), // 128 - 0b00000000 == 0b10000000
                 ),
             ),
             TestCase(
                 name = "$packed4Byte",
                 input = packed4Byte,
                 expectedOutput = byteArrayOf(
-//                    0b11100100.toByte(), // ignore most significant byte because using put3
-                    0b01010000.toByte(), // 128 - 464453887 == -464453759 == 0b11100100_01010000_11111111_10000001
-                    0b11111111.toByte(),
-                    0b10000001.toByte(),
+//                    a, // ignore most significant byte because using put3
+                    b,
+                    c,
+                    0b10000001.toByte(), // 128 - 0b11111111 == 0b10000001
                 ),
             ),
         ).map {

@@ -70,11 +70,12 @@ object WriteByteArrayDsl {
             transformation: Transformation = None,
             endian: Endian = Little
         ) {
-            val transformedValue = applyTransformation(value, transformation)
             val byteList = mutableListOf<Byte>()
 
             for (shift in (numBytes - 1) downTo 0) {
-                byteList.add((transformedValue shr (Byte.SIZE_BITS * shift)).toByte())
+                // Only apply the transformation to the final byte.
+                val transformedByte = if (shift == 0) applyTransformation(value, transformation) else value
+                byteList.add((transformedByte shr (Byte.SIZE_BITS * shift)).toByte())
             }
 
             when (endian) {

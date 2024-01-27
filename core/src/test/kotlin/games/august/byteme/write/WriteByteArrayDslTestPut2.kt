@@ -97,27 +97,35 @@ class WriteByteArrayDslTestPut2 {
         )
         return listOf(
             TestCase(
-                name = "175 (0b1010_1111)",
-                input = 0b1010_1111,
+                name = "31186 (0b01111001_11010010)",
+                input = 0b01111001_11010010,
                 expectedOutput = byteArrayOf(
-                    0b00000001.toByte(), // 0b00000000_10101111 + 128 == 303 == 0b00000001_00101111
-                    0b00101111.toByte(),
+                    0b01111001.toByte(), // 0b01111001
+                    0b01010010.toByte(), // 0b11010010 + 128 == 338 == 0b00000001_01010010 (First byte gets dropped after transformation)
+                ),
+            ),
+            TestCase(
+                name = "175 (0b00000000_10101111)",
+                input = 0b00000000_10101111,
+                expectedOutput = byteArrayOf(
+                    0b00000000.toByte(), // 0b00000000
+                    0b00101111.toByte(), // 0b10101111 + 128 == 0b00000001_00101111 (First byte gets dropped after transformation)
                 ),
             ),
             TestCase(
                 name = "44800 (0b10101111_00000000)",
                 input = 0b10101111_00000000,
                 expectedOutput = byteArrayOf(
-                    0b10101111.toByte(), // 0b10101111_00000000 + 128 == 44928 == 0b10101111_10000000
-                    0b10000000.toByte(),
+                    0b10101111.toByte(), // 0b10101111
+                    0b10000000.toByte(), // 0b10000000 + 128 == 128 == 0b10101111_10000000 (First byte gets dropped after transformation)
                 ),
             ),
             TestCase(
                 name = "Int.MAX_VALUE (0b11111111_11111111)",
                 input = Int.MAX_VALUE,
                 expectedOutput = byteArrayOf(
-                    0b00000000.toByte(), // 0b11111111_11111111 + 128 == (overflow) 65663 == 0b00000000_01111111
-                    0b01111111.toByte(),
+                    0b11111111.toByte(), // 0b11111111
+                    0b01111111.toByte(), // 0b11111111 + 128 == 383 == 0b00000001_01111111
                 ),
             ),
         ).map {
@@ -140,27 +148,27 @@ class WriteByteArrayDslTestPut2 {
         )
         return listOf(
             TestCase(
-                name = "175 (0b1010_1111)",
-                input = 0b1010_1111,
+                name = "175 (0b00000000_10101111)",
+                input = 0b00000000_10101111,
                 expectedOutput = byteArrayOf(
-                    0b11111111.toByte(), // -(0b00000000_10101111) == -175 == 0b11111111_01010001
-                    0b01010001.toByte(),
+                    0b00000000.toByte(),
+                    0b01010001.toByte(), // negate 0b10101111 == -175 == 0b11111111_11111111_11111111_01010001
                 ),
             ),
             TestCase(
                 name = "44800 (0b10101111_00000000)",
                 input = 0b10101111_00000000,
                 expectedOutput = byteArrayOf(
-                    0b01010001.toByte(), // -(0b10101111_00000000) == -44800 == 0b01010001_00000000
-                    0b00000000.toByte(),
+                    0b10101111.toByte(),
+                    0b00000000.toByte(), // negate 0b00000000 == 0b00000000
                 ),
             ),
             TestCase(
                 name = "Int.MAX_VALUE (0b11111111_11111111)",
                 input = Int.MAX_VALUE,
                 expectedOutput = byteArrayOf(
-                    0b00000000.toByte(), // -(0b11111111_11111111) == -65535 == 0b00000000_00000001
-                    0b00000001.toByte(),
+                    0b11111111.toByte(),
+                    0b00000001.toByte(), // negate 0b11111111 == -255 == 0b11111111_11111111_11111111_00000001
                 ),
             ),
         ).map {
@@ -183,27 +191,27 @@ class WriteByteArrayDslTestPut2 {
         )
         return listOf(
             TestCase(
-                name = "175 (0b1010_1111)",
-                input = 0b1010_1111,
+                name = "175 (0b00000000_10101111)",
+                input = 0b00000000_10101111,
                 expectedOutput = byteArrayOf(
-                    0b11111111.toByte(), // 128 - 0b00000000_10101111 == 128 - 175 == -47 == 0b11111111_11010001
-                    0b11010001.toByte(),
+                    0b00000000.toByte(),
+                    0b11010001.toByte(), // 128 - 0b00000000_10101111 == 128 - 175 == -47 == 0b11111111_11010001
                 ),
             ),
             TestCase(
                 name = "44800 (0b10101111_00000000)",
                 input = 0b10101111_00000000,
                 expectedOutput = byteArrayOf(
-                    0b01010001.toByte(), // 128 - 0b10101111_00000000 == 128 - 44800 == -44672 == 0b01010001_10000000
-                    0b10000000.toByte(),
+                    0b10101111.toByte(),
+                    0b10000000.toByte(), // 128 - 00000000 == 128 == 0b10000000
                 ),
             ),
             TestCase(
                 name = "Int.MAX_VALUE (0b11111111_11111111)",
                 input = Int.MAX_VALUE,
                 expectedOutput = byteArrayOf(
-                    0b00000000.toByte(), // 128 - 0b11111111_11111111 == 128 - 65535 == -65407 == 0b00000000_10000001
-                    0b10000001.toByte(),
+                    0b11111111.toByte(),
+                    0b10000001.toByte(), // 128 - 0b11111111 == -127 == 0b11111111_11111111_11111111_10000001
                 ),
             ),
         ).map {
