@@ -55,7 +55,7 @@ object WriteByteArrayDsl {
             endian: Endian,
         ) = byteWriter.putNumber(int, 4, transformation, endian)
 
-        fun putBytes(bytes: ByteArray, byteOrder: ByteOrder) {
+        fun putBytes(bytes: ByteArray, byteOrder: ByteOrder = ByteOrder.None) {
             byteWriter.putBytes(bytes, byteOrder)
         }
     }
