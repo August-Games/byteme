@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+    implementation("io.netty:netty-buffer:4.1.107.Final")
     testImplementation(kotlin("test"))
     testImplementation("com.google.truth:truth:1.1.4")
 }

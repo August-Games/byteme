@@ -2,13 +2,20 @@ package games.august.byteme.write
 
 import games.august.byteme.common.ByteOrder
 import games.august.byteme.common.Endian
-import games.august.byteme.common.Endian.*
+import games.august.byteme.common.Endian.Little
 import games.august.byteme.common.Transformation
 import games.august.byteme.common.Transformation.*
+import io.netty.buffer.ByteBuf
 
-fun bytes(block: WriteByteArrayDsl.WriteByteArrayBuilder.() -> Unit) = writeByteArray(block)
-fun writeByteArray(block: WriteByteArrayDsl.WriteByteArrayBuilder.() -> Unit): ByteArray {
-    val builder = WriteByteArrayDsl.WriteByteArrayBuilder()
+fun ByteBuf.write(block: WriteByteArrayDsl.WriteByteArrayBuilder<ByteBuf>.() -> Unit): ByteBuf {
+    val builder = WriteByteArrayDsl.WriteByteArrayBuilder(ByteBufByteWriter(this))
+    builder.block()
+    return builder.build()
+}
+
+fun bytes(block: WriteByteArrayDsl.WriteByteArrayBuilder<ByteArray>.() -> Unit) = writeByteArray(block)
+fun writeByteArray(block: WriteByteArrayDsl.WriteByteArrayBuilder<ByteArray>.() -> Unit): ByteArray {
+    val builder = WriteByteArrayDsl.WriteByteArrayBuilder(ByteArrayByteWriter())
     builder.block()
     return builder.build()
 }
@@ -19,105 +26,46 @@ object WriteByteArrayDsl {
     annotation class WriteByteArrayDslMarker
 
     @WriteByteArrayDslMarker
-    class WriteByteArrayBuilder {
-        private val bytes = mutableListOf<Byte>()
-
-        fun build(): ByteArray {
-            return bytes.toByteArray()
-        }
-
-        fun put1(byte: Byte) {
-            bytes.add(byte)
-        }
-
+    class WriteByteArrayBuilder<T>(
+        private val byteWriter: ByteWriter<T>,
+    ) {
+        fun build(): T = byteWriter.build()
         fun put1(
             int: Int,
             transformation: Transformation = None,
         ) {
-            putNumber(int, 1, transformation, Little)
+            byteWriter.putNumber(int, 1, transformation, Little)
         }
 
         fun put2(
             int: Int,
             transformation: Transformation = None,
             endian: Endian,
-        ) = putNumber(int, 2, transformation, endian)
+        ) = byteWriter.putNumber(int, 2, transformation, endian)
 
         fun put3(
             int: Int,
             transformation: Transformation = None,
             endian: Endian,
-        ) = putNumber(int, 3, transformation, endian)
+        ) = byteWriter.putNumber(int, 3, transformation, endian)
 
         fun put4(
             int: Int,
             transformation: Transformation = None,
             endian: Endian,
-        ) = putNumber(int, 4, transformation, endian)
+        ) = byteWriter.putNumber(int, 4, transformation, endian)
 
-        fun putBytes(bytes: ByteArray, byteOrder: ByteOrder = ByteOrder.None) {
-            this.bytes.addAll(
-                when (byteOrder) {
-                    ByteOrder.None -> bytes.toList()
-                    ByteOrder.Reversed -> bytes.reversed()
-                }
-            )
+        fun putBytes(bytes: ByteArray, byteOrder: ByteOrder) {
+            byteWriter.putBytes(bytes, byteOrder)
         }
+    }
+}
 
-        private fun putNumber(
-            value: Int,
-            numBytes: Int,
-            transformation: Transformation = None,
-            endian: Endian,
-        ) {
-            val byteList = mutableListOf<Byte>()
-
-            for (shift in (numBytes - 1) downTo 0) {
-                // Only apply the transformation to the final byte.
-                val transformedByte = if (shift == 0) applyTransformation(value, transformation) else value
-                byteList.add((transformedByte shr (Byte.SIZE_BITS * shift)).toByte())
-            }
-
-            when (endian) {
-                Big -> bytes.addAll(byteList)
-                Little -> bytes.addAll(byteList.asReversed())
-                Middle -> {
-                    if (numBytes < 3 || numBytes > 4) error("Middle order requires between 3 and 4 bytes")
-                    if (numBytes == 3) {
-                        bytes.add(byteList[0]) // A
-                        bytes.add(byteList[2]) // C
-                        bytes.add(byteList[1]) // B
-                    } else {
-                        bytes.add(byteList[2]) // C
-                        bytes.add(byteList[3]) // D
-                        bytes.add(byteList[0]) // A
-                        bytes.add(byteList[1]) // B
-                    }
-                }
-
-                InverseMiddle -> {
-                    if (numBytes < 3 || numBytes > 4) error("InverseMiddle order requires between 3 and 4 bytes")
-                    if (numBytes == 3) {
-                        bytes.add(byteList[2]) // C
-                        bytes.add(byteList[0]) // A
-                        bytes.add(byteList[1]) // B
-                    } else {
-                        bytes.add(byteList[1]) // B
-                        bytes.add(byteList[0]) // A
-                        bytes.add(byteList[3]) // D
-                        bytes.add(byteList[2]) // C
-                    }
-                }
-            }
-        }
-
-        private fun applyTransformation(value: Int, transformation: Transformation): Int {
-            return when (transformation) {
-                None -> value
-                Add -> value + 128
-                Negate -> -value
-                Subtract -> 128 - value
-            }
-        }
+internal fun applyTransformation(value: Int, transformation: Transformation): Int {
+    return when (transformation) {
+        None -> value
+        Add -> value + 128
+        Negate -> -value
+        Subtract -> 128 - value
     }
 }
